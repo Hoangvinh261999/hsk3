@@ -229,18 +229,18 @@ function LessonHSK3Page() {
           {/* Câu hỏi */}
           <div className="mb-6">
             <p className="text-2xl mb-4 font-semibold">
-              Nghĩa: <span className="text-gray-800">{currentWord?.meaning}</span>
+              Nghĩa: <span className="text-gray-800 font-bold">{currentWord?.meaning}</span>
             </p>
 
-            <input
-              type="text"
-              value={userAnswer}
-              onChange={(e) => setUserAnswer(e.target.value)}
-              onKeyDown={handleKeyPress}
-              placeholder="Nhập tiếng Trung"
-              className="border-2 border-gray-300 rounded-lg px-6 py-3 w-full max-w-md text-center text-2xl"
-              autoFocus
-            />
+                  <input
+                  type="text"
+                  value={userAnswer}
+                  onChange={(e) => setUserAnswer(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  placeholder="Nhập tiếng Trung"
+                  className="border-2 text-4xl font-bold border-gray-300 rounded-lg px-6 py-3 w-full max-w-md text-center"
+                  autoFocus
+                />
 
             <div className="mt-6">
               {feedback ? (
@@ -267,9 +267,11 @@ function LessonHSK3Page() {
             <div className="mt-6">
               {currentWord?.example && (
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4 text-left">
-                  <p className="text-gray-800">
+                  <p className="text-gray-800  text-2xl font-semibold mb-2">
                     <span className="font-semibold">Ví dụ:</span> {currentWord.example.sentence}
                   </p>
+                                    <p className="text-xl text-black-800">Phiên âm: {currentWord.pinyin}</p>
+
                   <p className="text-sm text-gray-500">{currentWord.example.pinyin}</p>
                   <p className="text-sm text-gray-500 italic">{currentWord.example.translation}</p>
                 </div>
