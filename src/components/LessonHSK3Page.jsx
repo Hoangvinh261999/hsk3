@@ -12,16 +12,19 @@ function LessonHSK3Page() {
   const [loading, setLoading] = useState(true);
   const [isReview, setIsReview] = useState(false); // đang ôn từ sai
 
+  // chế độ luyện tập: "trung" = gõ tiếng Trung, "viet" = gõ tiếng Việt
+  const [mode, setMode] = useState("trung");
+
   // trạng thái câu hiện tại
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userAnswer, setUserAnswer] = useState("");
   const [feedback, setFeedback] = useState(null);
 
   // thống kê
-  const [correctCount, setCorrectCount] = useState(0);       // số lần trả lời đúng
-  const [wrongAttempts, setWrongAttempts] = useState(0);     // tổng số lần sai
-  const [wrongCounts, setWrongCounts] = useState({});        // key -> số lần sai
-  const [wrongPool, setWrongPool] = useState([]);            // danh sách từ cần ôn lại (unique)
+  const [correctCount, setCorrectCount] = useState(0);
+  const [wrongAttempts, setWrongAttempts] = useState(0);
+  const [wrongCounts, setWrongCounts] = useState({});
+  const [wrongPool, setWrongPool] = useState([]);
   const [finished, setFinished] = useState(false);
 
   // tạo key ổn định cho từ (ưu tiên id, fallback chinese)
@@ -63,7 +66,6 @@ function LessonHSK3Page() {
     setWrongCounts((prev) => ({ ...prev, [key]: (prev[key] || 0) + 1 }));
     setWrongAttempts((n) => n + 1);
     setWrongPool((prev) => {
-      // đảm bảo unique theo key
       const exists = prev.some((w) => getKey(w) === key);
       return exists ? prev : [...prev, word];
     });
@@ -74,25 +76,57 @@ function LessonHSK3Page() {
     setWrongPool((prev) => prev.filter((w) => getKey(w) !== key));
   };
 
-  const checkAnswer = () => {
-    if (!userAnswer.trim()) return;
-    const current = words[currentIndex];
-    const correctAnswer = String(current.chinese || "").trim();
-    const user = userAnswer.trim();
+  // ===== Helpers =====
+  function removeVietnameseTones(input) {
+    const str = (input ?? "").toString(); // ép về string để luôn có .normalize
+    try {
+      return str
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "") // xóa dấu
+        .replace(/đ/g, "d")
+        .replace(/Đ/g, "D");
+    } catch {
+      // Fallback an toàn nếu môi trường lạ không hỗ trợ normalize
+      return str.replace(/đ/g, "d").replace(/Đ/g, "D");
+    }
+  }
 
-    if (user === correctAnswer) {
+  function norm(input) {
+    return removeVietnameseTones((input ?? "").toString().trim().toLowerCase());
+  }
+
+  // ===== Check answer =====
+  function checkAnswer() {
+    const currentWord = words[currentIndex];
+    const normalizedUser = norm(userAnswer);
+
+    let isCorrect = false;
+
+    if (mode === "trung") {
+      // Gõ tiếng Trung → so sánh 100% với chinese
+      const target = norm(currentWord?.chinese);
+      if (normalizedUser.length > 0 && normalizedUser === target) {
+        isCorrect = true;
+      }
+    } else {
+      // Gõ tiếng Việt → chứa trong meaning (yêu cầu >= 2 ký tự)
+      const targetMeaning = norm(currentWord?.meaning);
+      if (normalizedUser.length >= 2 && targetMeaning.includes(normalizedUser)) {
+        isCorrect = true;
+      }
+    }
+
+    if (isCorrect) {
       setFeedback("✅ Đúng rồi!");
       setCorrectCount((c) => c + 1);
-      // nếu từ này từng sai, khi đã đúng thì bỏ khỏi danh sách cần ôn
-      removeFromWrongPoolIfPresent(current);
+      removeFromWrongPoolIfPresent(currentWord);
     } else {
-      setFeedback(`❌ Sai! Đúng: ${correctAnswer}`);
-      addToWrongPool(current);
+      setFeedback("❌ Sai rồi!");
+      addToWrongPool(currentWord);
     }
-  };
+  }
 
   const nextQuestion = () => {
-    // sang câu kế trong lượt hiện tại
     if (currentIndex + 1 < words.length) {
       setCurrentIndex((i) => i + 1);
       setUserAnswer("");
@@ -100,31 +134,25 @@ function LessonHSK3Page() {
       return;
     }
 
-    // hết lượt hiện tại
     if (!isReview) {
-      // lượt đầu → nếu có từ sai thì chuyển sang ôn lại
       if (wrongPool.length > 0) {
         setIsReview(true);
-        setWords(wrongPool);        // set bộ câu hỏi thành các từ sai
+        setWords(wrongPool);
         setCurrentIndex(0);
         setUserAnswer("");
         setFeedback(null);
         return;
       }
-      // không có từ sai → hoàn thành
       setFinished(true);
       return;
     }
 
-    // đang ôn lại: nếu vẫn còn từ sai (wrongPool có thể đã bị remove dần khi trả lời đúng)
     if (wrongPool.length > 0) {
-      // chạy thêm một vòng ôn các từ còn sai
       setWords(wrongPool);
       setCurrentIndex(0);
       setUserAnswer("");
       setFeedback(null);
     } else {
-      // đã làm đúng hết toàn bộ từ sai
       setFinished(true);
     }
   };
@@ -172,11 +200,31 @@ function LessonHSK3Page() {
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg text-center">
-      <h1 className="text-3xl font-bold text-blue-700 mb-2">
+      <h1 className="text-3xl font-bold text-blue-700 mb-4">
         HSK3 - Game luyện tập: Bài {lessonNumber}
       </h1>
 
-      {/* Thanh trạng thái / thống kê */}
+      {/* Chọn chế độ */}
+      <div className="flex justify-center gap-4 mb-6">
+        <button
+          onClick={() => setMode("trung")}
+          className={`px-4 py-2 rounded-lg ${
+            mode === "trung" ? "bg-blue-500 text-white" : "bg-gray-200"
+          }`}
+        >
+          Gõ tiếng Trung
+        </button>
+        <button
+          onClick={() => setMode("viet")}
+          className={`px-4 py-2 rounded-lg ${
+            mode === "viet" ? "bg-blue-500 text-white" : "bg-gray-200"
+          }`}
+        >
+          Gõ tiếng Việt
+        </button>
+      </div>
+
+      {/* Thanh trạng thái */}
       <div className="flex flex-wrap items-center justify-center gap-3 mb-4">
         {isReview && (
           <span className="px-3 py-1 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-700 border border-yellow-300">
@@ -229,18 +277,32 @@ function LessonHSK3Page() {
           {/* Câu hỏi */}
           <div className="mb-6">
             <p className="text-2xl mb-4 font-semibold">
-              Nghĩa: <span className="text-gray-800 font-bold">{currentWord?.meaning}</span>
+              {mode === "trung" ? (
+                <>
+                  Nghĩa:{" "}
+                  <span className="text-gray-800 font-bold">
+                    {currentWord?.meaning}
+                  </span>
+                </>
+              ) : (
+                <>
+                  Tiếng Trung:{" "}
+                  <span className="text-gray-800 font-bold">
+                    {currentWord?.chinese}
+                  </span>
+                </>
+              )}
             </p>
 
-                  <input
-                  type="text"
-                  value={userAnswer}
-                  onChange={(e) => setUserAnswer(e.target.value)}
-                  onKeyDown={handleKeyPress}
-                  placeholder="Nhập tiếng Trung"
-                  className="border-2 text-4xl font-bold border-gray-300 rounded-lg px-6 py-3 w-full max-w-md text-center"
-                  autoFocus
-                />
+            <input
+              type="text"
+              value={userAnswer}
+              onChange={(e) => setUserAnswer(e.target.value)}
+              onKeyDown={handleKeyPress}
+              placeholder={mode === "trung" ? "Nhập tiếng Trung" : "Nhập tiếng Việt"}
+              className="border-2 text-4xl font-bold border-gray-300 rounded-lg px-6 py-3 w-full max-w-md text-center"
+              autoFocus
+            />
 
             <div className="mt-6">
               {feedback ? (
@@ -262,18 +324,20 @@ function LessonHSK3Page() {
             </div>
           </div>
 
-          {/* Ví dụ sau khi check */}
+          {/* Ví dụ */}
           {feedback && (
             <div className="mt-6">
               {currentWord?.example && (
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4 text-left">
-                  <p className="text-gray-800  text-2xl font-semibold mb-2">
-                    <span className="font-semibold">Ví dụ:</span> {currentWord.example.sentence}
+                  <p className="text-gray-800 text-2xl font-semibold mb-2">
+                    <span className="font-semibold">Ví dụ:</span>{" "}
+                    {currentWord.example.sentence}
                   </p>
-                                    <p className="text-xl text-black-800">Phiên âm: {currentWord.pinyin}</p>
-
+                  <p className="text-xl text-black-800">Phiên âm: {currentWord.pinyin}</p>
                   <p className="text-sm text-gray-500">{currentWord.example.pinyin}</p>
-                  <p className="text-sm text-gray-500 italic">{currentWord.example.translation}</p>
+                  <p className="text-sm text-gray-500 italic">
+                    {currentWord.example.translation}
+                  </p>
                 </div>
               )}
 
@@ -287,7 +351,7 @@ function LessonHSK3Page() {
             </div>
           )}
 
-          {/* Nút vào chế độ ôn lại ngay (tuỳ chọn) */}
+          {/* Ôn lại */}
           {!isReview && wrongPool.length > 0 && !feedback && (
             <div className="mt-6">
               <button
