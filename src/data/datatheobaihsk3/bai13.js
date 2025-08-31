@@ -123,7 +123,7 @@ const words = [
     id: 195,
     chinese: "应该",
     pinyin: "yīnggāi",
-    meaning: "Nên, cần phải",
+    meaning: "Nguyện, bằng lòng, sẵn lòng, hy vọng , mong muốn",
     example: {
       sentence: "你应该多锻炼身体。",
       pinyin: "Nǐ yīnggāi duō duànliàn shēntǐ.",
