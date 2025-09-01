@@ -27,7 +27,7 @@ const vocabulary = [
     id: 253,
     chinese: "邻居",
     pinyin: "línjū",
-    meaning: "Láng giềng",
+    meaning: "Láng giềng, hang xóm",
     example: {
       sentence: "我的邻居很友好。",
       pinyin: "Wǒ de línjū hěn yǒuhǎo.",
