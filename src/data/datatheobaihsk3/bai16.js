@@ -156,3 +156,4 @@ const words = [
     usage: "Danh từ; đơn vị ngôn ngữ gồm từ hoặc cụm từ."
   }
 ];
+export default words;
