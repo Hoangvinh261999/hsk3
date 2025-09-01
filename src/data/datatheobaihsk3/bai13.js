@@ -99,7 +99,7 @@ const words = [
     id: 193,
     chinese: "愿意",
     pinyin: "yuànyì",
-    meaning: "Muốn, sẵn sàng",
+    meaning: "nguyện; vui lòng; bằng lòng; sẵn lòng; nguyện ý; tình nguyện; đồng ý",
     example: {
       sentence: "如果你需要，我愿意帮忙。",
       pinyin: "Rúguǒ nǐ xūyào, wǒ yuànyì bāngmáng.",
@@ -123,7 +123,7 @@ const words = [
     id: 195,
     chinese: "应该",
     pinyin: "yīnggāi",
-    meaning: "Nguyện, bằng lòng, sẵn lòng, hy vọng , mong muốn",
+    meaning: "nên; phải; cần; cần phải",
     example: {
       sentence: "你应该多锻炼身体。",
       pinyin: "Nǐ yīnggāi duō duànliàn shēntǐ.",
