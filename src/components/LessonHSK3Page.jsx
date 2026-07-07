@@ -7,7 +7,6 @@ function LessonHSK3Page() {
   const lessonNumber = parseInt(lessonId, 10);
 
   // dữ liệu + vòng chơi
-  const [baseWords, setBaseWords] = useState([]);
   const [words, setWords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isReview, setIsReview] = useState(false); // đang ôn từ sai
@@ -23,7 +22,6 @@ function LessonHSK3Page() {
   // thống kê
   const [correctCount, setCorrectCount] = useState(0);
   const [wrongAttempts, setWrongAttempts] = useState(0);
-  const [wrongCounts, setWrongCounts] = useState({});
   const [wrongPool, setWrongPool] = useState([]);
   const [finished, setFinished] = useState(false);
 
