@@ -8,7 +8,7 @@ import VocabLearning from './pages/vocabexcercise';
 import WriteChinesePageHsk1 from './pages/WriteChineseHsk1';
 import WriteChinesePageHsk2 from './pages/WriteChineseHsk2';
 import WriteChinesePageHsk3 from './pages/WriteChineseHsk3';
-import FlashcardGame from './pages/flashcard/FlashcardGame;';
+import FlashcardGame from './pages/flashcard/FlashcardGame';
 import Hsk3LessonList from './components/Hsk3LessonList';
 import LessonHSK3Page from './components/LessonHSK3Page';
 import { useState } from 'react';
