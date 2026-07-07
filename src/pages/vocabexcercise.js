@@ -4,12 +4,7 @@ import { useNavigate } from 'react-router-dom';
 const GameSelectionPage = () => {
   const navigate = useNavigate();
   const [level, setLevel] = useState('3'); // mặc định HSK3
-  const [showLessons, setShowLessons] = useState(false);
-  const totalLessons = 20; // mỗi cấp có 20 bài (có thể chỉnh)
 
-const handleNavigateLesson = (lesson) => {
-  navigate(`/hsk${level}/bai${lesson}`);
-};
 
   const handleNavigateGame = (path) => {
     navigate(`${path}/hsk${level}`);
