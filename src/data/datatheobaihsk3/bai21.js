@@ -1,4 +1,4 @@
-const vocabularyFactory = [
+const words = [
   {
     id: 1,
     chinese: "今天",
@@ -959,4 +959,4 @@ const vocabularyFactory = [
   },
 ];
 
-export default vocabularyFactory;
+export default words;

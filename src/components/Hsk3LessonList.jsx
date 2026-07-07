@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 function Hsk3LessonList() {
-  const lessons = Array.from({ length: 20 }, (_, i) => i + 1);
+  const lessons = Array.from({ length: 21 }, (_, i) => i + 1);
 
   return (
     <div className="max-w-xl mx-auto bg-white p-6 rounded shadow">

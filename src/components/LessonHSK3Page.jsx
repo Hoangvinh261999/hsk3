@@ -375,7 +375,7 @@ function LessonHSK3Page() {
             ) : (
               <div />
             )}
-            {lessonNumber < 20 ? (
+            {lessonNumber < 21 ? (
               <button
                 onClick={() => goToLesson(lessonNumber + 1)}
                 className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
